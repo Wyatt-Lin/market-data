@@ -24,8 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # always start from the newest main, not the commit the run was triggered on
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - run: pip install requests==2.32.3
@@ -48,5 +51,12 @@ jobs:
           git config user.name "market-data-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          git diff --cached --quiet || git commit -m "data: ${{ steps.mode.outputs.mode }} $(TZ=Asia/Taipei date +%F_%H%M)"
-          git pull --rebase --autostash && git push
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "data: ${{ steps.mode.outputs.mode }} $(TZ=Asia/Taipei date +%F_%H%M)"
+          # if main moved meanwhile, replay on top and keep this run's data files on conflict
+          for i in 1 2 3; do
+            if git pull --rebase -X theirs origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          exit 1
