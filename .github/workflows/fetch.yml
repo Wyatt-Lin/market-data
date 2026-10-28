@@ -1,0 +1,52 @@
+name: fetch-market-data
+
+on:
+  schedule:
+    # Taiwan close snapshot: 15:40 Taipei (07:40 UTC), Mon-Fri
+    - cron: "40 7 * * 1-5"
+    # US close snapshot: 05:40 Taipei (21:40 UTC previous day), Mon-Fri UTC = Tue-Sat Taipei
+    - cron: "40 21 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "tw, us, or all"
+        default: "all"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests==2.32.3
+      - name: Pick mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "40 7 * * 1-5" ]; then
+            echo "mode=tw" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=us" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Fetch
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/fetch.py "${{ steps.mode.outputs.mode }}"
+      - name: Commit data
+        run: |
+          git config user.name "market-data-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet || git commit -m "data: ${{ steps.mode.outputs.mode }} $(TZ=Asia/Taipei date +%F_%H%M)"
+          git pull --rebase --autostash && git push
