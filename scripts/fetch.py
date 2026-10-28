@@ -287,6 +287,7 @@ def tpex_index(out):
                 if v and v > 50:
                     out["otc"] = v
                     out["otc_chg"] = num(pick(r, "Change", "漲跌"))
+                    out["otc_date"] = roc_to_iso(pick(r, "Date", "日期") or "")
                     break
             if "otc" in out:
                 break
@@ -296,9 +297,9 @@ def tpex_index(out):
 
 
 # ---------------------------------------------------------------- US
+# ICE BofA OAS series (BAMLH0A0HYM2, BAMLC0A0CM) are left out on purpose: FRED's licence for ICE data
+# does not allow republishing it in a public repo. The morning report reads those two from the FRED page.
 FRED = {
-    "hy_oas": "BAMLH0A0HYM2",
-    "ig_oas": "BAMLC0A0CM",
     "real10y": "DFII10",
     "us10y": "DGS10",
     "us2y": "DGS2",
@@ -381,7 +382,7 @@ def main():
         # flag any field whose own date differs from the trading session (e.g. a source not yet updated)
         sd = (tw.get("session_date") or "").replace("-", "")
         stale = []
-        for k in ("flows_date", "pc_date", "foreign_fut_date", "margin_px_date"):
+        for k in ("flows_date", "pc_date", "foreign_fut_date", "margin_px_date", "otc_date"):
             v = str(tw.get(k) or "").replace("-", "").replace("/", "")
             if sd and v and v != sd:
                 stale.append(f"{k}={tw.get(k)}")
@@ -403,6 +404,8 @@ def main():
         if k in snap:
             merged = latest.get(k, {})
             merged.update({kk: vv for kk, vv in snap[k].items() if vv is not None})
+            for kk in [x for x in merged if x.startswith(("hy_oas", "ig_oas"))]:
+                del merged[kk]  # ICE data is not republished (see FRED note above)
             merged["snapshot_date"] = TODAY
             latest[k] = merged
     latest["updated_at"] = NOW.isoformat(timespec="minutes")
