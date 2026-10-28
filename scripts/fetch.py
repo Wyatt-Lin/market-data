@@ -87,7 +87,36 @@ def pick(row, *keys):
 
 
 # ---------------------------------------------------------------- Taiwan
+def roc_to_iso(s):
+    """'115/10/28' or '1151028' -> '2026-10-28'."""
+    s = str(s).strip().replace("/", "")
+    if len(s) == 7 and s.isdigit():
+        return f"{int(s[:3]) + 1911}-{s[3:5]}-{s[5:]}"
+    if len(s) == 8 and s.isdigit():
+        return f"{s[:4]}-{s[4:6]}-{s[6:]}"
+    return s
+
+
+def twse_daily(out):
+    """Same-day TAIEX close, change and turnover (the openapi MI_INDEX lags a day)."""
+    d = get("https://www.twse.com.tw/rwd/zh/afterTrading/FMTQIK", {"response": "json"})
+    save_raw("twse_fmtqik", d)
+    rows = d.get("data") or []
+    if rows:
+        r = rows[-1]
+        out["session_date"] = roc_to_iso(r[0])
+        out["turnover"] = round(num(r[2]) / 1e8, 2) if num(r[2]) else None
+        out["taiex"] = num(r[4])
+        out["taiex_chg"] = num(r[5])
+        if out.get("taiex") and out.get("taiex_chg") is not None:
+            out["taiex_pct"] = round(out["taiex_chg"] / (out["taiex"] - out["taiex_chg"]) * 100, 2)
+        out["taiex_date"] = out["session_date"]
+    log("twse_daily", out.get("taiex") is not None, f"date={out.get('session_date')}")
+
+
 def twse_index(out):
+    if out.get("taiex") is not None:
+        return  # already filled from the same-day source
     d = get("https://openapi.twse.com.tw/v1/exchangeReport/MI_INDEX")
     save_raw("twse_mi_index", d)
     for row in d:
@@ -110,8 +139,12 @@ def twse_flows(out):
     rows = d.get("data", [])
     vals = {r[0]: num(r[3]) for r in rows if len(r) >= 4}
     yi = lambda v: None if v is None else round(v / 1e8, 2)  # 元 -> 億元
-    foreign = sum(v for k, v in vals.items() if "外資" in k and v is not None)
-    dealer = sum(v for k, v in vals.items() if "自營商" in k and v is not None)
+    # row names: 自營商(自行買賣) / 自營商(避險) / 投信 / 外資及陸資(不含外資自營商) / 外資自營商 / 合計
+    # "外資及陸資(不含外資自營商)" contains the word 自營商, so match on the row's start.
+    foreign = sum(v for k, v in vals.items() if k.strip().startswith("外資") and v is not None)
+    dealer = sum(v for k, v in vals.items() if k.strip().startswith("自營商") and v is not None)
+    out["dealer_self"] = yi(next((v for k, v in vals.items() if k.strip().startswith("自營商") and "自行" in k), None))
+    out["dealer_hedge"] = yi(next((v for k, v in vals.items() if k.strip().startswith("自營商") and "避險" in k), None))
     out["foreign"] = yi(foreign)
     out["trust"] = yi(next((v for k, v in vals.items() if "投信" in k), None))
     out["dealer"] = yi(dealer)
@@ -148,7 +181,23 @@ def twse_margin(out):
         except StopIteration:
             i_bal = None
         closes = {}
+        try:  # same-day closes first
+            px = get("https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX", {"response": "json", "type": "ALLBUT0999"})
+            save_raw("twse_mi_index_all", px)
+            for t in px.get("tables") or []:
+                f = t.get("fields") or []
+                if "證券代號" in f and "收盤價" in f:
+                    ic, ip = f.index("證券代號"), f.index("收盤價")
+                    for r in t.get("data") or []:
+                        c = num(r[ip])
+                        if c:
+                            closes[str(r[ic]).strip()] = c
+            out["margin_px_date"] = px.get("date")
+        except Exception as e:  # noqa: BLE001
+            log("twse_close_sameday", False, repr(e)[:200])
         try:
+            if closes:
+                raise StopIteration  # skip the lagging fallback
             px = get("https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL")
             save_raw("twse_stock_day_all", px)
             for r in px:
@@ -156,6 +205,8 @@ def twse_margin(out):
                 code = pick(r, "Code", "證券代號")
                 if code and c:
                     closes[str(code).strip()] = c
+        except StopIteration:
+            pass
         except Exception as e:  # noqa: BLE001
             log("twse_close", False, repr(e)[:200])
         if i_bal is not None and closes:
@@ -281,7 +332,7 @@ def fred(out):
 
 YAHOO = {"vix": "^VIX", "vix3m": "^VIX3M", "move": "^MOVE", "sox": "^SOX", "tsm_adr": "TSM",
          "spx": "^GSPC", "nasdaq": "^IXIC", "dow": "^DJI", "rut": "^RUT", "wti": "CL=F", "brent": "BZ=F",
-         "gold": "GC=F", "dxy": "DX-Y.NYB", "usdtwd": "TWD=X"}
+         "gold": "GC=F", "dxy": "DX-Y.NYB", "usdtwd": "TWD=X", "us10y_live": "^TNX"}
 
 
 def yahoo(out):
@@ -299,6 +350,10 @@ def yahoo(out):
             log(f"yahoo_{sym}", field in out)
         except Exception as e:  # noqa: BLE001
             log(f"yahoo_{sym}", False, repr(e)[:200])
+    # continuous futures (CL=F, BZ=F) can jump at contract roll; flag opposite-sign moves
+    if out.get("wti_pct") is not None and out.get("brent_pct") is not None and out["wti_pct"] * out["brent_pct"] < 0 \
+            and abs(out["wti_pct"] - out["brent_pct"]) > 2:
+        out["oil_note"] = "WTI 與 Brent 漲跌方向相反且差距大，可能是期貨換月，請以新聞報價為準"
     if out.get("tsm_adr") and out.get("usdtwd"):
         out["_adr_twd_equiv"] = round(out["tsm_adr"] * out["usdtwd"] / 5, 2)
 
@@ -320,9 +375,17 @@ def main():
 
     if mode in ("tw", "all"):
         tw = {}
-        for name, fn in [("twse_index", twse_index), ("twse_flows", twse_flows), ("twse_margin", twse_margin),
-                         ("taifex", taifex), ("taifex_vix", taifex_vix), ("tpex", tpex_index)]:
+        for name, fn in [("twse_daily", twse_daily), ("twse_index", twse_index), ("twse_flows", twse_flows),
+                         ("twse_margin", twse_margin), ("taifex", taifex), ("tpex", tpex_index)]:
             run(name, fn, tw)
+        # flag any field whose own date differs from the trading session (e.g. a source not yet updated)
+        sd = (tw.get("session_date") or "").replace("-", "")
+        stale = []
+        for k in ("flows_date", "pc_date", "foreign_fut_date", "margin_px_date"):
+            v = str(tw.get(k) or "").replace("-", "").replace("/", "")
+            if sd and v and v != sd:
+                stale.append(f"{k}={tw.get(k)}")
+        tw["stale_fields"] = stale
         tw["fetched_at"] = NOW.isoformat(timespec="minutes")
         snap["tw"] = tw
     if mode in ("us", "all"):
