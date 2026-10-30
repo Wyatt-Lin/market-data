@@ -1,17 +1,17 @@
 {
  "tw": {
-  "taiex": 46368.33,
-  "taiex_chg": -667.25,
-  "taiex_pct": -1.42,
-  "taiex_date": "2026-10-29",
-  "foreign": -688.15,
-  "trust": 70.44,
-  "dealer": -215.0,
-  "inst_total": -832.71,
-  "flows_date": "20261029",
-  "margin_bal": 6339.11,
-  "margin_chg": 16.11,
-  "margin_ratio": 178.44,
+  "taiex": 45211.83,
+  "taiex_chg": -1156.5,
+  "taiex_pct": -2.49,
+  "taiex_date": "2026-10-30",
+  "foreign": -1124.67,
+  "trust": 236.19,
+  "dealer": -513.69,
+  "inst_total": -1402.18,
+  "flows_date": "20261030",
+  "margin_bal": 6234.68,
+  "margin_chg": -104.43,
+  "margin_ratio": 171.75,
   "pc_ratio": 64.46,
   "pc_date": "20261029",
   "foreign_fut_net_oi": -89522.0,
@@ -19,14 +19,16 @@
   "fut_close": 46577.0,
   "otc": 418.82,
   "otc_chg": 1.75,
-  "fetched_at": "2026-10-30T09:20+08:00",
-  "snapshot_date": "2026-10-30",
-  "session_date": "2026-10-29",
-  "turnover": 8238.13,
-  "dealer_self": -1.84,
-  "dealer_hedge": -213.16,
-  "margin_px_date": "20261029",
+  "fetched_at": "2026-10-31T02:12+08:00",
+  "snapshot_date": "2026-10-31",
+  "session_date": "2026-10-30",
+  "turnover": 9396.05,
+  "dealer_self": -38.4,
+  "dealer_hedge": -475.29,
+  "margin_px_date": "20261030",
   "stale_fields": [
+   "pc_date=20261029",
+   "foreign_fut_date=20261029",
    "otc_date=2026-10-01"
   ],
   "otc_date": "2026-10-01"
@@ -103,5 +105,5 @@
   "us10y_live_pct": -1.11,
   "oil_note": "WTI 與 Brent 漲跌方向相反且差距大，可能是期貨換月，請以新聞報價為準"
  },
- "updated_at": "2026-10-30T09:20+08:00"
+ "updated_at": "2026-10-31T02:12+08:00"
 }

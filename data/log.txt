@@ -154,3 +154,10 @@
 2026-10-30T09:20+08:00	yahoo_DX-Y.NYB	ok	
 2026-10-30T09:20+08:00	yahoo_TWD=X	ok	
 2026-10-30T09:20+08:00	yahoo_^TNX	ok	
+2026-10-31T02:12+08:00	twse_daily	ok	date=2026-10-30
+2026-10-31T02:12+08:00	twse_flows	ok	
+2026-10-31T02:12+08:00	twse_margin	ok	ratio=171.75
+2026-10-31T02:12+08:00	taifex_pc	ok	
+2026-10-31T02:12+08:00	taifex_foreign_oi	ok	
+2026-10-31T02:12+08:00	taifex_fut	ok	
+2026-10-31T02:12+08:00	tpex_index	ok	
