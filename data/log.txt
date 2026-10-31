@@ -161,3 +161,32 @@
 2026-10-31T02:12+08:00	taifex_foreign_oi	ok	
 2026-10-31T02:12+08:00	taifex_fut	ok	
 2026-10-31T02:12+08:00	tpex_index	ok	
+2026-10-31T09:00+08:00	twse_daily	ok	date=2026-10-30
+2026-10-31T09:00+08:00	twse_flows	ok	
+2026-10-31T09:00+08:00	twse_margin	ok	ratio=171.75
+2026-10-31T09:00+08:00	taifex_pc	ok	
+2026-10-31T09:00+08:00	taifex_foreign_oi	ok	
+2026-10-31T09:00+08:00	taifex_fut	ok	
+2026-10-31T09:00+08:00	tpex_index	ok	
+2026-10-31T09:00+08:00	fred_DFII10	ok	
+2026-10-31T09:00+08:00	fred_DGS10	ok	
+2026-10-31T09:00+08:00	fred_DGS2	ok	
+2026-10-31T09:00+08:00	fred_VIXCLS	ok	
+2026-10-31T09:00+08:00	fred_STLFSI4	ok	
+2026-10-31T09:00+08:00	fred_NFCI	ok	
+2026-10-31T09:00+08:00	fred_DTWEXBGS	ok	
+2026-10-31T09:00+08:00	yahoo_^VIX	ok	
+2026-10-31T09:00+08:00	yahoo_^VIX3M	ok	
+2026-10-31T09:00+08:00	yahoo_^MOVE	ok	
+2026-10-31T09:00+08:00	yahoo_^SOX	ok	
+2026-10-31T09:00+08:00	yahoo_TSM	ok	
+2026-10-31T09:00+08:00	yahoo_^GSPC	ok	
+2026-10-31T09:00+08:00	yahoo_^IXIC	ok	
+2026-10-31T09:00+08:00	yahoo_^DJI	ok	
+2026-10-31T09:00+08:00	yahoo_^RUT	ok	
+2026-10-31T09:00+08:00	yahoo_CL=F	ok	
+2026-10-31T09:00+08:00	yahoo_BZ=F	ok	
+2026-10-31T09:00+08:00	yahoo_GC=F	ok	
+2026-10-31T09:00+08:00	yahoo_DX-Y.NYB	ok	
+2026-10-31T09:00+08:00	yahoo_TWD=X	ok	
+2026-10-31T09:00+08:00	yahoo_^TNX	ok	
