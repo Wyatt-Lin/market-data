@@ -1,0 +1,32 @@
+name: intraday
+on:
+  schedule:
+    # 台股盤中 台北 09:05–13:50（UTC 01:05–05:50），每 15 分鐘
+    - cron: "5-50/15 1-5 * * 1-5"
+    # 美股盤中 台北 22:35–05:20（UTC 14:35–21:20），每 15 分鐘
+    - cron: "5-50/15 14-21 * * 1-5"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: market-data-push
+  cancel-in-progress: false
+jobs:
+  snap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/intraday.py
+      - name: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/intraday.json
+          git diff --cached --quiet && exit 0
+          git commit -m "intraday snapshot $(TZ=Asia/Taipei date +%F' '%H:%M)"
+          for i in 1 2 3; do git pull --rebase -X theirs && git push && exit 0; sleep 5; done
+          exit 1
