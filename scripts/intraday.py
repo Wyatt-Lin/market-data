@@ -51,6 +51,8 @@ def build(key, sym, label, mkt, dp, unit):
     # 前收用日 K 的官方收盤（5 分鐘線最後一根不一定等於收盤價）
     prev = None
     try:
+        if key == "twd":  # 外匯日 K 收盤時點不固定，改用前一日最後一根 5 分鐘線
+            raise ValueError("fx")
         d = fetch(sym, "1d", "10d")
         dtz = timezone(timedelta(seconds=d["meta"].get("gmtoffset", 0)))
         daily = [(datetime.fromtimestamp(t, dtz).strftime("%Y-%m-%d"), c)
