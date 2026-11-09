@@ -17,9 +17,9 @@
   "foreign_fut_net_oi": -99930.0,
   "foreign_fut_date": "20261106",
   "fut_close": 39786.0,
-  "otc": 369.24,
-  "otc_chg": -1.02,
-  "fetched_at": "2026-11-09T15:41+08:00",
+  "otc": 321.97,
+  "otc_chg": 17.95,
+  "fetched_at": "2026-11-09T16:09+08:00",
   "snapshot_date": "2026-11-09",
   "session_date": "2026-11-09",
   "turnover": 8639.35,
@@ -29,9 +29,10 @@
   "stale_fields": [
    "pc_date=20261106",
    "foreign_fut_date=20261106",
-   "otc_date=2026-11-02"
+   "margin_date=20261106"
   ],
-  "otc_date": "2026-11-02"
+  "otc_date": "2026-11-09",
+  "margin_date": "20261106"
  },
  "us": {
   "real10y": 2.6,
@@ -82,28 +83,28 @@
   "rut": 2754.1101,
   "rut_date": "2026-11-06",
   "rut_pct": 0.887,
-  "wti": 89.77,
+  "wti": 90.18,
   "wti_date": "2026-11-09",
-  "wti_pct": -1.167,
-  "brent": 96.6,
+  "wti_pct": -0.716,
+  "brent": 96.85,
   "brent_date": "2026-11-09",
-  "brent_pct": -1.749,
-  "gold": 4107.7998,
+  "brent_pct": -1.495,
+  "gold": 4093.3999,
   "gold_date": "2026-11-09",
-  "gold_pct": 0.807,
-  "dxy": 102.033,
+  "gold_pct": 0.454,
+  "dxy": 101.987,
   "dxy_date": "2026-11-08",
-  "dxy_pct": -0.261,
-  "usdtwd": 32.798,
+  "dxy_pct": -0.306,
+  "usdtwd": 32.803,
   "usdtwd_date": "2026-11-09",
-  "usdtwd_pct": -0.94,
-  "_adr_twd_equiv": 2462.74,
-  "fetched_at": "2026-11-09T15:41+08:00",
+  "usdtwd_pct": -0.925,
+  "_adr_twd_equiv": 2463.11,
+  "fetched_at": "2026-11-09T16:09+08:00",
   "snapshot_date": "2026-11-09",
   "us10y_live": 4.859,
   "us10y_live_date": "2026-11-06",
   "us10y_live_pct": 0.455,
   "oil_note": "WTI 與 Brent 漲跌方向相反且差距大，可能是期貨換月，請以新聞報價為準"
  },
- "updated_at": "2026-11-09T15:41+08:00"
+ "updated_at": "2026-11-09T16:09+08:00"
 }
