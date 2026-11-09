@@ -261,6 +261,14 @@ def taifex(out):
             tx.sort(key=lambda r: str(pick(r, "ContractMonth(Week)", "到期月份")))
             out["fut_close"] = num(pick(tx[0], "Last", "收盤價", "Close"))
         log("taifex_fut", out.get("fut_close") is not None)
+        # 夜盤（盤後交易時段）近月收盤；期交所把夜盤記在「下一個交易日」，fut_night_date 照抄報表日期
+        nt = [r for r in fut if str(pick(r, "Contract", "契約")).strip() == "TX"
+              and "/" not in str(pick(r, "ContractMonth(Week)", "到期月份")) and "W" not in str(pick(r, "ContractMonth(Week)", "到期月份")).upper() and "盤後" in str(pick(r, "TradingSession", "交易時段"))]
+        if nt:
+            nt.sort(key=lambda r: str(pick(r, "ContractMonth(Week)", "到期月份")))
+            out["fut_night"] = num(pick(nt[0], "Last", "收盤價", "Close"))
+            out["fut_night_date"] = pick(nt[0], "Date", "日期")
+        log("taifex_fut_night", out.get("fut_night") is not None, f"date={out.get('fut_night_date')}")
     except Exception as e:  # noqa: BLE001
         log("taifex_fut", False, repr(e)[:200])
 
