@@ -157,6 +157,7 @@ def twse_margin(out):
     """Market margin balance + maintenance ratio computed from per-stock data."""
     d = get("https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN", {"response": "json", "selectType": "ALL"})
     save_raw("twse_mi_margn_all", d)
+    out["margin_date"] = d.get("date")  # 融資約 21:00 才公布；較早執行會拿到前一交易日
     tables = d.get("tables") or []
     summary = next((t for t in tables if "信用交易統計" in (t.get("title") or "")), tables[0] if tables else None)
     per_stock = next((t for t in tables if t is not summary and len(t.get("data") or []) > 50), None)
@@ -209,7 +210,11 @@ def twse_margin(out):
             pass
         except Exception as e:  # noqa: BLE001
             log("twse_close", False, repr(e)[:200])
-        if i_bal is not None and closes:
+        # 只有收盤價與融資餘額是同一天時才算維持率，避免「舊餘額 × 新股價」（11/09 15:41 曾算出 161.99%）
+        same_day = str(out.get("margin_px_date") or "") == str(out.get("margin_date") or "")
+        if not same_day:
+            log("twse_margin_ratio", False, f"skip: margin {out.get('margin_date')} vs px {out.get('margin_px_date')}")
+        if i_bal is not None and closes and same_day:
             mv = 0.0
             for r in per_stock.get("data", []):
                 code = str(r[i_code]).strip()
@@ -282,14 +287,16 @@ def tpex_index(out):
             d = get(url)
             save_raw("tpex_" + url.rsplit("/", 1)[-1], d)
             rows = d if isinstance(d, list) else []
+            # 這支 API 回的是當月每日資料、日期由舊到新；以前取第一列，所以 otc 一直停在月初（11/02）。
+            # 改成取日期最新的一列。
+            best = None
             for r in rows:
                 v = num(pick(r, "Close", "收盤", "TPExIndex", "指數"))
-                if v and v > 50:
-                    out["otc"] = v
-                    out["otc_chg"] = num(pick(r, "Change", "漲跌"))
-                    out["otc_date"] = roc_to_iso(pick(r, "Date", "日期") or "")
-                    break
-            if "otc" in out:
+                day = roc_to_iso(pick(r, "Date", "日期") or "")
+                if v and v > 50 and (best is None or (day or "") > (best[0] or "")):
+                    best = (day, v, num(pick(r, "Change", "漲跌")))
+            if best:
+                out["otc_date"], out["otc"], out["otc_chg"] = best
                 break
         except Exception as e:  # noqa: BLE001
             log("tpex", False, f"{url}: {repr(e)[:150]}")
@@ -382,7 +389,7 @@ def main():
         # flag any field whose own date differs from the trading session (e.g. a source not yet updated)
         sd = (tw.get("session_date") or "").replace("-", "")
         stale = []
-        for k in ("flows_date", "pc_date", "foreign_fut_date", "margin_px_date", "otc_date"):
+        for k in ("flows_date", "pc_date", "foreign_fut_date", "margin_date", "margin_px_date", "otc_date"):
             v = str(tw.get(k) or "").replace("-", "").replace("/", "")
             if sd and v and v != sd:
                 stale.append(f"{k}={tw.get(k)}")
