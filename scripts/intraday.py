@@ -57,9 +57,12 @@ def build(key, sym, label, mkt, dp, unit):
         dtz = timezone(timedelta(seconds=d["meta"].get("gmtoffset", 0)))
         daily = [(datetime.fromtimestamp(t, dtz).strftime("%Y-%m-%d"), c)
                  for t, c in zip(d.get("timestamp") or [], d["indicators"]["quote"][0]["close"]) if c is not None]
-        before = [c for day, c in daily if session and day < session]
-        if before:
-            prev = round(before[-1] * scale, 4)
+        before = [(day, c) for day, c in daily if session and day < session]
+        # 日 K 在開盤初期常缺前一交易日那根（11/06 曾拿到 11/04 收盤）：
+        # 只有當日 K 的日期等於 5 分鐘線裡的前一交易日時才採用，否則改用前一交易日最後一根 5 分鐘線
+        prev_day_5m = datetime.fromtimestamp(earlier[-1][0], tz).strftime("%Y-%m-%d") if earlier else None
+        if before and (prev_day_5m is None or before[-1][0] >= prev_day_5m):
+            prev = round(before[-1][1] * scale, 4)
     except Exception:
         pass
     if prev is None and earlier:
