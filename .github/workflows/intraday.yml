@@ -1,10 +1,12 @@
 name: intraday
 on:
   schedule:
-    # 台股盤中 台北 09:05–13:50（UTC 01:05–05:50），每 15 分鐘
-    - cron: "5-50/15 1-5 * * 1-5"
-    # 美股盤中 台北 22:35–05:20（UTC 14:35–21:20），每 15 分鐘
-    - cron: "5-50/15 14-21 * * 1-5"
+    # GitHub 排程是盡力而為：整點與 :00/:05 附近最容易延遲或被丟掉，所以用奇數分鐘。
+    # 台股盤中 台北 09:07–13:52（UTC 01:07–05:52），每 15 分鐘
+    - cron: "7-52/15 1-5 * * 1-5"
+    # 美股盤中 台北 22:37–05:22（UTC 14:37–21:22），每 15 分鐘
+    - cron: "7-52/15 14-21 * * 1-5"
+  # 外部排程（cron-job.org）會用 workflow_dispatch 準時觸發，GitHub 排程變成備援
   workflow_dispatch:
 permissions:
   contents: write
@@ -17,6 +19,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -28,5 +32,5 @@ jobs:
           git add data/intraday.json
           git diff --cached --quiet && exit 0
           git commit -m "intraday snapshot $(TZ=Asia/Taipei date +%F' '%H:%M)"
-          for i in 1 2 3; do git pull --rebase -X theirs && git push && exit 0; sleep 5; done
+          for i in 1 2 3; do git pull --rebase -X theirs origin main && git push origin HEAD:main && exit 0; git rebase --abort 2>/dev/null || true; sleep $((i * 5)); done
           exit 1
