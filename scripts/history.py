@@ -217,6 +217,31 @@ def taifex_all(rows, start, end):
         v = num(getk(r, "多空淨額未平倉口數", "多空未平倉口數淨額"))
         if day and v is not None:
             rows.setdefault(day, {})["foreign_fut_net_oi"] = v
+    # 台指期日盤／夜盤近月收盤（期貨每日交易行情；夜盤列在它所屬的「下一個交易日」）
+    best = {}
+    for r in taifex_csv("https://www.taifex.com.tw/cht/3/futDataDown", start, end,
+                        {"down_type": "1", "commodity_id": "TX", "commodity_id2": ""}):
+        mon = (getk(r, "到期月份") or "").strip()
+        if not mon or "/" in mon or "W" in mon.upper() or (getk(r, "契約") or "").strip() != "TX":
+            continue
+        day = (getk(r, "交易日期") or "").replace("/", "-")
+        sess = "fut_night" if "盤後" in (getk(r, "交易時段") or "") else "fut_close"
+        v = num(getk(r, "收盤價"))
+        if not day or v is None:
+            continue
+        if (day, sess) not in best or mon < best[(day, sess)][0]:  # 到期月份最小＝近月
+            best[(day, sess)] = (mon, v)
+    # 期交所把夜盤記在「下一個交易日」；這裡改記在夜盤開始的那個交易日（例：11/06 週五晚上的夜盤記 11/06），
+    # 跟終端的盤中夜盤圖一致。需要交易日清單，用日盤有資料的日期。
+    tdays = sorted(d for (d, ss) in best if ss == "fut_close")
+    for (day, sess), (_, v) in best.items():
+        if sess == "fut_night":
+            prior = [d for d in tdays if d < day]
+            if not prior:
+                continue
+            day = prior[-1]
+        rows.setdefault(day, {})[sess] = v
+    log("taifex_fut_daily", bool(best), f"{len(best)} day-sessions")
     for r in taifex_csv("https://www.taifex.com.tw/cht/3/pcRatioDown", start, end, {}):
         day = (getk(r, "日期") or "").replace("/", "-")
         v = num(getk(r, "未平倉量比率"))

@@ -78,6 +78,69 @@ def build(key, sym, label, mkt, dp, unit):
         "points": pts,
     }
 
+# ---------------------------------------------------------------- 台指期夜盤（期交所 MIS，台北 15:00–次日 05:00）
+MIS = "https://mis.taifex.com.tw/futures/api/"
+
+
+def mis_post(path, body):
+    req = urllib.request.Request(MIS + path, data=json.dumps(body).encode(), method="POST",
+                                 headers={**UA, "Content-Type": "application/json", "Origin": "https://mis.taifex.com.tw",
+                                          "Referer": "https://mis.taifex.com.tw/futures/"})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        return json.load(r)
+
+
+def night_session_date(now):
+    """夜盤 15:00 開盤、次日 05:00 收盤；00:00–05:00 的點屬於前一天開始的那一盤。"""
+    return (now - timedelta(days=1) if now.hour < 12 else now).strftime("%Y-%m-%d")
+
+
+def tx_night(prev):
+    """回傳台指期近月夜盤序列。先試 1 分 K（getChartData1M），失敗就用即時報價，接在上一份檔案的點後面。"""
+    now = datetime.now(TPE)
+    ses = night_session_date(now)
+    if not (now.hour >= 15 or now.hour < 6):
+        # 日盤時段：保留上一份檔案的夜盤（若是同一盤）供終端顯示，不重抓
+        old = (prev or {}).get("series", {}).get("tx_night")
+        return old  # 沒有就回 None，不算錯誤
+    q = mis_post("getQuoteList", {"MarketType": "1", "SymbolType": "F", "KindID": "1", "CID": "TXF",
+                                  "ExpireMonth": "", "RowSize": "全部", "PageNo": "", "SortColumn": "", "AscDesc": "A"})
+    rows = (q.get("RtData") or {}).get("QuoteList") or []
+    rows = [r for r in rows if r.get("SymbolID") and r.get("CLastPrice") not in (None, "", "0")]
+    if not rows:
+        raise RuntimeError(f"no quote rows; keys={list(q)[:5]}")
+    # 近月 = 成交量最大的月合約（避開週選與遠月）
+    near = max(rows, key=lambda r: float(str(r.get("CTotalVolume") or 0).replace(",", "") or 0))
+    sym = near["SymbolID"]
+    last = float(str(near["CLastPrice"]).replace(",", ""))
+    ref = near.get("CRefPrice")
+    ref = float(str(ref).replace(",", "")) if ref not in (None, "", "0") else None
+    pts = []
+    try:  # 1 分 K：一次拿到整盤，取 5 分鐘一點
+        c = mis_post("getChartData1M", {"SymbolID": sym})
+        ticks = (c.get("RtData") or {}).get("Ticks") or (c.get("RtData") or {}).get("ChartData") or []
+        for t in ticks:
+            tm = str(t.get("Time") or t.get("time") or t.get("T") or "")
+            px = t.get("Close") or t.get("Price") or t.get("C")
+            if len(tm) >= 4 and px not in (None, ""):
+                hhmm = tm[-6:-2] if len(tm) >= 6 else tm[-4:]
+                if hhmm[-1] in "05":  # 每 5 分鐘一點
+                    pts.append({"t": f"{hhmm[:2]}:{hhmm[2:]}", "v": round(float(px), 1)})
+    except Exception as e:  # noqa: BLE001
+        print("tx_night chart fallback:", repr(e)[:150])
+    if not pts:  # 退而求其次：把這次的即時價接在同一盤的舊點後面
+        old = (prev or {}).get("series", {}).get("tx_night")
+        if old and old.get("session_date") == ses:
+            pts = list(old.get("points") or [])
+        stamp = now.strftime("%H:%M")
+        if not pts or pts[-1]["t"] != stamp:
+            pts.append({"t": stamp, "v": last})
+    return {"label": "台指期夜盤", "market": "tw", "symbol": sym, "dp": 0, "unit": "", "session_date": ses,
+            "last": last, "prev_close": ref, "chg": round(last - ref, 1) if ref else None,
+            "pct": round((last / ref - 1) * 100, 3) if ref else None,
+            "last_time": now.strftime("%Y-%m-%d %H:%M"), "points": pts, "night": True}
+
+
 def main():
     out = {"updated_at": datetime.now(TPE).strftime("%Y-%m-%dT%H:%M+08:00"), "series": {}, "errors": {}}
     for row in SYMBOLS:
@@ -87,6 +150,13 @@ def main():
             out["errors"][row[0]] = f"{type(e).__name__}: {e}"[:200]
         time.sleep(0.3)
     s = out["series"]
+    try:
+        prev = json.load(open("data/intraday.json", encoding="utf-8")) if os.path.exists("data/intraday.json") else None
+        tn = tx_night(prev)
+        if tn:
+            s["tx_night"] = tn
+    except Exception as e:  # noqa: BLE001
+        out["errors"]["tx_night"] = f"{type(e).__name__}: {e}"[:200]
     # ADR 溢價：TSM × 匯率 ÷ 5，對比「與 ADR 同一日期」的台積電收盤（台股先收盤、美股後開盤）
     try:
         fx = s["twd"]["last"]
