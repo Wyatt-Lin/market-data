@@ -26,7 +26,7 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       # always start from the newest main, not the commit the run was triggered on
       - uses: actions/checkout@v5
@@ -50,6 +50,11 @@ jobs:
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/fetch.py "${{ steps.mode.outputs.mode }}"
+      - name: Update history series (last 7 days, fills only missing fields)
+        continue-on-error: true
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/history.py --recent 7
       - name: Commit data
         run: |
           git config user.name "market-data-bot"
