@@ -1,0 +1,50 @@
+name: history-backfill
+# 手動回填歷史日序列到 data/series.json（第一次用：start 填 2026-05-01）
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "起始日 YYYY-MM-DD"
+        default: "2026-05-01"
+      end:
+        description: "結束日 YYYY-MM-DD（空白＝今天）"
+        default: ""
+permissions:
+  contents: write
+concurrency:
+  group: fetch
+  cancel-in-progress: false
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install requests==2.32.3
+      - name: Backfill
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          if [ -n "${{ inputs.end }}" ]; then
+            python scripts/history.py --start "${{ inputs.start }}" --end "${{ inputs.end }}"
+          else
+            python scripts/history.py --start "${{ inputs.start }}"
+          fi
+      - name: Commit
+        run: |
+          git config user.name "market-data-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/series.json data/log.txt
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "data: history backfill ${{ inputs.start }}..${{ inputs.end }}"
+          for i in 1 2 3; do
+            if git pull --rebase -X theirs origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          exit 1
