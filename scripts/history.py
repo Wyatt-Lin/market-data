@@ -246,7 +246,15 @@ def tpex_all(rows, start, end):
                 for t in tables:
                     fields = [str(f) for f in (t.get("fields") or [])]
                     data = t.get("data") or t.get("aaData") or []
-                    i_close = next((i for i, f in enumerate(fields) if "收盤" in f or "指數" in f), 1)
+                    # 欄位可能是 日期/開盤/最高/最低/收盤…：一定要先找「收盤」，不能用「指數」（會先對到開盤指數）
+                    i_close = next((i for i, f in enumerate(fields) if "收盤" in f), None)
+                    if i_close is None:
+                        i_close = next((i for i, f in enumerate(fields) if f.strip() in ("指數", "櫃買指數", "收市")), None)
+                    if i_close is None:
+                        err = f"no close column in fields={fields}"
+                        continue
+                    if (y, m) == (start.year, start.month):
+                        log(f"tpex_fields_{y}{m:02d}", True, f"close col {i_close}: {fields}")
                     i_chg = next((i for i, f in enumerate(fields) if "漲跌" in f), None)
                     for r in data:
                         n += put(roc_to_iso(r[0]), num(r[i_close]), num(r[i_chg]) if i_chg is not None else None)
