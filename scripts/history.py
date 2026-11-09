@@ -224,8 +224,52 @@ def taifex_all(rows, start, end):
             rows.setdefault(day, {})["pc_ratio"] = v
 
 
+# ---------------------------------------------------------------- 櫃買指數（Yahoo 沒有 ^TWOII，改用櫃買中心）
+def tpex_all(rows, start, end):
+    """先試櫃買中心的歷史月資料，再用 openapi（只有當月，但最穩定）補。"""
+    def put(day, close, chg):
+        if day and close and close > 50 and start.strftime("%Y-%m-%d") <= day <= end.strftime("%Y-%m-%d"):
+            rows.setdefault(day, {})["otc"] = close
+            if chg is not None:
+                rows[day]["otc_chg"] = chg
+            return 1
+        return 0
+    for y, m in months(start, end):
+        n, err = 0, None
+        for url, params in (
+            ("https://www.tpex.org.tw/www/zh-tw/indexInfo/inxh", {"date": f"{y}/{m:02d}/01", "response": "json"}),
+            ("https://www.tpex.org.tw/web/stock/iNdex_info/inxh/Inx_result.php", {"l": "zh-tw", "d": f"{y - 1911}/{m:02d}", "o": "json"}),
+        ):
+            try:
+                d = http(url, params=params).json()
+                tables = d.get("tables") or [d]
+                for t in tables:
+                    fields = [str(f) for f in (t.get("fields") or [])]
+                    data = t.get("data") or t.get("aaData") or []
+                    i_close = next((i for i, f in enumerate(fields) if "收盤" in f or "指數" in f), 1)
+                    i_chg = next((i for i, f in enumerate(fields) if "漲跌" in f), None)
+                    for r in data:
+                        n += put(roc_to_iso(r[0]), num(r[i_close]), num(r[i_chg]) if i_chg is not None else None)
+                if n:
+                    break
+                err = f"no rows; keys={list(d)[:6]}"
+            except Exception as e:  # noqa: BLE001
+                err = repr(e)[:150]
+            time.sleep(1.5)
+        log(f"tpex_{y}{m:02d}", n > 0, f"{n} days" if n else err)
+    try:
+        d = http("https://www.tpex.org.tw/openapi/v1/tpex_index").json()
+        n = 0
+        for r in d if isinstance(d, list) else []:
+            n += put(roc_to_iso(getk(r, "Date", "日期") or ""), num(getk(r, "Close", "收盤", "TPExIndex", "指數")),
+                     num(getk(r, "Change", "漲跌")))
+        log("tpex_openapi", n > 0, f"{n} days")
+    except Exception as e:  # noqa: BLE001
+        log("tpex_openapi", False, repr(e)[:150])
+
+
 # ---------------------------------------------------------------- Yahoo / FRED
-YAHOO = {"otc": "^TWOII", "twd": "TWD=X", "tsmc": "2330.TW", "sox": "^SOX", "spx": "^GSPC", "nasdaq": "^IXIC",
+YAHOO = {"twd": "TWD=X", "tsmc": "2330.TW", "sox": "^SOX", "spx": "^GSPC", "nasdaq": "^IXIC",
          "tsm_adr": "TSM", "vix": "^VIX", "vix3m": "^VIX3M", "move": "^MOVE", "us10y": "^TNX"}
 
 
@@ -312,6 +356,7 @@ def main():
     log("twse_days", True, f"{len(trading_days)} trading days {start:%Y-%m-%d}..{end:%Y-%m-%d}")
 
     taifex_all(new, start, end)
+    tpex_all(new, start, end)
     yahoo_all(new, start, end)
     fred_all(new, start, end)
 
