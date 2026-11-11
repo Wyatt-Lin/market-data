@@ -1,0 +1,38 @@
+{
+ "date": "2026-11-12",
+ "tw": {
+  "session_date": "2026-11-11",
+  "turnover": 8762.95,
+  "taiex": 44257.15,
+  "taiex_chg": 1545.23,
+  "taiex_pct": 3.62,
+  "taiex_date": "2026-11-11",
+  "dealer_self": 28.01,
+  "dealer_hedge": 34.56,
+  "foreign": -7.66,
+  "trust": 185.85,
+  "dealer": 62.57,
+  "inst_total": 240.76,
+  "flows_date": "20261111",
+  "margin_date": "20261111",
+  "margin_bal": 5411.58,
+  "margin_chg": 44.79,
+  "margin_px_date": "20261111",
+  "margin_ratio": 174.17,
+  "pc_ratio": 66.54,
+  "pc_date": "20261110",
+  "foreign_fut_net_oi": -103473.0,
+  "foreign_fut_date": "20261110",
+  "fut_close": 42623.0,
+  "fut_night": 42542.0,
+  "fut_night_date": "20261110",
+  "otc_date": "2026-11-11",
+  "otc": 344.11,
+  "otc_chg": 11.14,
+  "stale_fields": [
+   "pc_date=20261110",
+   "foreign_fut_date=20261110"
+  ],
+  "fetched_at": "2026-11-12T03:52+08:00"
+ }
+}

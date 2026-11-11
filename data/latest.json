@@ -19,8 +19,8 @@
   "fut_close": 42623.0,
   "otc": 344.11,
   "otc_chg": 11.14,
-  "fetched_at": "2026-11-11T21:43+08:00",
-  "snapshot_date": "2026-11-11",
+  "fetched_at": "2026-11-12T03:52+08:00",
+  "snapshot_date": "2026-11-12",
   "session_date": "2026-11-11",
   "turnover": 8762.95,
   "dealer_self": 28.01,
@@ -107,5 +107,5 @@
   "us10y_live_pct": 0.301,
   "oil_note": "WTI 與 Brent 漲跌方向相反且差距大，可能是期貨換月，請以新聞報價為準"
  },
- "updated_at": "2026-11-11T21:43+08:00"
+ "updated_at": "2026-11-12T03:52+08:00"
 }
