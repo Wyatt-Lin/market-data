@@ -1475,3 +1475,33 @@
 2026-11-12T21:43+08:00	history:fred_STLFSI4	ERROR	0 obs
 2026-11-12T21:43+08:00	history:fred_NFCI	ok	1 obs
 2026-11-12T21:43+08:00	history:fred_DFII10	ok	3 obs
+2026-11-13T04:28+08:00	twse_daily	ok	date=2026-11-12
+2026-11-13T04:28+08:00	twse_flows	ok	
+2026-11-13T04:28+08:00	twse_margin	ok	ratio=167.22
+2026-11-13T04:28+08:00	taifex_pc	ok	
+2026-11-13T04:28+08:00	taifex_foreign_oi	ok	
+2026-11-13T04:28+08:00	taifex_fut	ok	
+2026-11-13T04:28+08:00	taifex_fut_night	ok	date=20261111
+2026-11-13T04:28+08:00	tpex_index	ok	
+2026-11-13T04:28+08:00	history:fmtqik_202611	ok	9 rows
+2026-11-13T04:28+08:00	history:twse_days	ok	5 trading days 2026-11-06..2026-11-13
+2026-11-13T04:28+08:00	history:taifex_futContractsDateDown_202611	ERROR	ValueError('no csv rows (631 bytes)')
+2026-11-13T04:28+08:00	history:taifex_futDataDown_202611	ok	132 rows
+2026-11-13T04:28+08:00	history:taifex_fut_daily	ok	10 day-sessions
+2026-11-13T04:28+08:00	history:taifex_pcRatioDown_202611	ok	5 rows
+2026-11-13T04:28+08:00	history:tpex_fields_202611	ok	close col 4: ['日期', '開市', '最高', '最低', '收市', '漲/跌']
+2026-11-13T04:28+08:00	history:tpex_202611	ok	5 days
+2026-11-13T04:28+08:00	history:tpex_openapi	ok	5 days
+2026-11-13T04:28+08:00	history:yahoo_TWD=X	ok	5 days
+2026-11-13T04:28+08:00	history:yahoo_2330.TW	ok	4 days
+2026-11-13T04:28+08:00	history:yahoo_^SOX	ok	5 days
+2026-11-13T04:28+08:00	history:yahoo_^GSPC	ok	5 days
+2026-11-13T04:28+08:00	history:yahoo_^IXIC	ok	5 days
+2026-11-13T04:28+08:00	history:yahoo_TSM	ok	5 days
+2026-11-13T04:28+08:00	history:yahoo_^VIX	ok	5 days
+2026-11-13T04:28+08:00	history:yahoo_^VIX3M	ok	5 days
+2026-11-13T04:28+08:00	history:yahoo_^MOVE	ok	4 days
+2026-11-13T04:28+08:00	history:yahoo_^TNX	ok	5 days
+2026-11-13T04:28+08:00	history:fred_STLFSI4	ok	1 obs
+2026-11-13T04:28+08:00	history:fred_NFCI	ok	1 obs
+2026-11-13T04:28+08:00	history:fred_DFII10	ok	2 obs
