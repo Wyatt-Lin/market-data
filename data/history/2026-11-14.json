@@ -19,21 +19,18 @@
   "margin_chg": 31.24,
   "margin_px_date": "20261113",
   "margin_ratio": 170.67,
-  "pc_ratio": 66.69,
-  "pc_date": "20261112",
-  "foreign_fut_net_oi": -99573.0,
-  "foreign_fut_date": "20261112",
-  "fut_close": 43178.0,
-  "fut_night": 44606.0,
-  "fut_night_date": "20261112",
+  "pc_ratio": 57.75,
+  "pc_date": "20261113",
+  "foreign_fut_net_oi": -100870.0,
+  "foreign_fut_date": "20261113",
+  "fut_close": 43834.0,
+  "fut_night": 43676.0,
+  "fut_night_date": "20261113",
   "otc_date": "2026-11-13",
   "otc": 342.41,
   "otc_chg": 6.68,
-  "stale_fields": [
-   "pc_date=20261112",
-   "foreign_fut_date=20261112"
-  ],
-  "fetched_at": "2026-11-14T06:42+08:00"
+  "stale_fields": [],
+  "fetched_at": "2026-11-14T09:49+08:00"
  },
  "us": {
   "real10y": 2.86,
@@ -96,13 +93,13 @@
   "dxy": 103.411,
   "dxy_date": "2026-11-13",
   "dxy_pct": 0.234,
-  "usdtwd": 32.875,
+  "usdtwd": 32.939,
   "usdtwd_date": "2026-11-13",
-  "usdtwd_pct": 0.04,
+  "usdtwd_pct": 0.235,
   "us10y_live": 5.154,
   "us10y_live_date": "2026-11-13",
   "us10y_live_pct": 0.999,
-  "_adr_twd_equiv": 2621.65,
-  "fetched_at": "2026-11-14T06:42+08:00"
+  "_adr_twd_equiv": 2626.75,
+  "fetched_at": "2026-11-14T09:49+08:00"
  }
 }
