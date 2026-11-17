@@ -19,16 +19,15 @@
   "fut_close": 40885.0,
   "otc": 306.61,
   "otc_chg": -12.51,
-  "fetched_at": "2026-11-17T21:44+08:00",
-  "snapshot_date": "2026-11-17",
+  "fetched_at": "2026-11-18T05:21+08:00",
+  "snapshot_date": "2026-11-18",
   "session_date": "2026-11-17",
   "turnover": 10128.68,
   "dealer_self": 63.87,
   "dealer_hedge": -220.84,
   "margin_px_date": "20261117",
   "stale_fields": [
-   "pc_date=20261116",
-   "foreign_fut_date=20261116"
+   "pc_date=20261116"
   ],
   "otc_date": "2026-11-17",
   "margin_date": "20261117",
@@ -107,5 +106,5 @@
   "us10y_live_pct": 0.078,
   "oil_note": "WTI 與 Brent 漲跌方向相反且差距大，可能是期貨換月，請以新聞報價為準"
  },
- "updated_at": "2026-11-17T21:44+08:00"
+ "updated_at": "2026-11-18T05:21+08:00"
 }
