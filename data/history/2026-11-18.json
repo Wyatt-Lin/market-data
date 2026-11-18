@@ -28,7 +28,7 @@
   "otc": 306.61,
   "otc_chg": -12.51,
   "stale_fields": [],
-  "fetched_at": "2026-11-18T11:08+08:00"
+  "fetched_at": "2026-11-18T11:43+08:00"
  },
  "us": {
   "real10y": 2.92,
@@ -79,25 +79,25 @@
   "rut": 2701.8706,
   "rut_date": "2026-11-17",
   "rut_pct": -1.497,
-  "wti": 85.05,
+  "wti": 85.13,
   "wti_date": "2026-11-18",
-  "wti_pct": -1.116,
-  "brent": 92.67,
+  "wti_pct": -1.023,
+  "brent": 92.77,
   "brent_date": "2026-11-18",
-  "brent_pct": -0.505,
-  "gold": 3801.8999,
+  "brent_pct": -0.397,
+  "gold": 3792.8,
   "gold_date": "2026-11-18",
-  "gold_pct": -1.612,
-  "dxy": 103.622,
+  "gold_pct": -1.848,
+  "dxy": 103.61,
   "dxy_date": "2026-11-17",
-  "dxy_pct": 0.128,
-  "usdtwd": 32.956,
+  "dxy_pct": 0.116,
+  "usdtwd": 32.935,
   "usdtwd_date": "2026-11-18",
-  "usdtwd_pct": -0.021,
+  "usdtwd_pct": -0.085,
   "us10y_live": 5.103,
   "us10y_live_date": "2026-11-17",
   "us10y_live_pct": -0.351,
-  "_adr_twd_equiv": 2370.79,
-  "fetched_at": "2026-11-18T11:08+08:00"
+  "_adr_twd_equiv": 2369.28,
+  "fetched_at": "2026-11-18T11:43+08:00"
  }
 }
