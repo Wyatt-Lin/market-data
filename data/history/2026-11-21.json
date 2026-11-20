@@ -21,8 +21,6 @@
   "margin_ratio": 140.4,
   "pc_ratio": 41.0,
   "pc_date": "20261119",
-  "foreign_fut_net_oi": -99219.0,
-  "foreign_fut_date": "20261119",
   "fut_close": 38649.0,
   "fut_night": 39987.0,
   "fut_night_date": "20261119",
@@ -30,9 +28,8 @@
   "otc": 263.31,
   "otc_chg": -22.02,
   "stale_fields": [
-   "pc_date=20261119",
-   "foreign_fut_date=20261119"
+   "pc_date=20261119"
   ],
-  "fetched_at": "2026-11-21T04:45+08:00"
+  "fetched_at": "2026-11-21T05:33+08:00"
  }
 }
