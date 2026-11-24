@@ -23,9 +23,9 @@
   "pc_date": "20261123",
   "foreign_fut_net_oi": -103432.0,
   "foreign_fut_date": "20261123",
-  "fut_close": 36576.0,
-  "fut_night": 33919.0,
-  "fut_night_date": "20261123",
+  "fut_close": 40324.0,
+  "fut_night": 39829.0,
+  "fut_night_date": "20261124",
   "otc_date": "2026-11-24",
   "otc": 293.23,
   "otc_chg": 22.33,
@@ -33,7 +33,7 @@
    "pc_date=20261123",
    "foreign_fut_date=20261123"
   ],
-  "fetched_at": "2026-11-25T06:43+08:00"
+  "fetched_at": "2026-11-25T06:47+08:00"
  },
  "us": {
   "real10y": 2.79,
