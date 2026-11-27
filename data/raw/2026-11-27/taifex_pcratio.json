@@ -1,5 +1,14 @@
 [
  {
+  "Date": "20261126",
+  "PutVolume": "151782",
+  "CallVolume": "176676",
+  "PutCallVolumeRatio%": "85.91",
+  "PutOI": "73367",
+  "CallOI": "139680",
+  "PutCallOIRatio%": "52.53"
+ },
+ {
   "Date": "20261125",
   "PutVolume": "424378",
   "CallVolume": "504421",
