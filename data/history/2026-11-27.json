@@ -30,7 +30,7 @@
   "otc": 289.84,
   "otc_chg": 13.87,
   "stale_fields": [],
-  "fetched_at": "2026-11-27T11:47+08:00"
+  "fetched_at": "2026-11-27T12:17+08:00"
  },
  "us": {
   "real10y": 2.79,
@@ -81,26 +81,26 @@
   "rut": 2704.0601,
   "rut_date": "2026-11-25",
   "rut_pct": 0.712,
-  "wti": 85.71,
+  "wti": 85.73,
   "wti_date": "2026-11-27",
-  "wti_pct": 2.426,
-  "brent": 92.24,
+  "wti_pct": 2.45,
+  "brent": 92.29,
   "brent_date": "2026-11-27",
-  "brent_pct": -2.505,
-  "gold": 3653.3999,
+  "brent_pct": -2.452,
+  "gold": 3654.8999,
   "gold_date": "2026-11-27",
-  "gold_pct": 3.326,
-  "dxy": 103.684,
+  "gold_pct": 3.368,
+  "dxy": 103.725,
   "dxy_date": "2026-11-25",
-  "dxy_pct": 0.014,
-  "usdtwd": 32.945,
+  "dxy_pct": 0.053,
+  "usdtwd": 32.964,
   "usdtwd_date": "2026-11-27",
-  "usdtwd_pct": -0.735,
+  "usdtwd_pct": -0.678,
   "us10y_live": 4.848,
   "us10y_live_date": "2026-11-25",
   "us10y_live_pct": -1.142,
   "oil_note": "WTI 與 Brent 漲跌方向相反且差距大，可能是期貨換月，請以新聞報價為準",
-  "_adr_twd_equiv": 2255.68,
-  "fetched_at": "2026-11-27T11:47+08:00"
+  "_adr_twd_equiv": 2256.98,
+  "fetched_at": "2026-11-27T12:17+08:00"
  }
 }
